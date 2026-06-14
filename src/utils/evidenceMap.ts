@@ -198,12 +198,147 @@ export const EVIDENCE_MAP: Record<string, EvidenceCategory> = {
       },
     ],
   },
+
+  "Specialty Occupation": {
+    category: "Specialty Occupation",
+    rationale: "USCIS challenges that the position doesn't require a highly specialized bachelor's degree. You must prove the complexity of the duties.",
+    items: [
+      {
+        id: "so-1",
+        label: "Technical job description addendum",
+        description: "A highly detailed breakdown of duties mapping to specific university-level coursework.",
+        priority: "required",
+      },
+      {
+        id: "so-2",
+        label: "Expert Opinion Letter (EOL)",
+        description: "An evaluation from a university professor certifying that the role requires specialized knowledge.",
+        priority: "required",
+      },
+      {
+        id: "so-3",
+        label: "Comparable industry job postings",
+        description: "5-10 listings from competitors demonstrating that a bachelor's degree in a specific field is standard for the role.",
+        priority: "recommended",
+      },
+      {
+        id: "so-4",
+        label: "Organizational chart showing peer credentials",
+        description: "Show that peers in similar roles within the organization hold equivalent degrees.",
+        priority: "recommended",
+      },
+    ],
+  },
+
+  "Wage Level Challenge": {
+    category: "Wage Level Challenge",
+    rationale: "USCIS challenges the Level I entry-level wage. You must show the duties are performed under direct supervision or align them with Level I definitions.",
+    items: [
+      {
+        id: "wlc-1",
+        label: "Revised duty statements emphasizing oversight",
+        description: "Remove terms like 'lead', 'architect', or 'independent' and replace them with 'assists', 'collaborates', or 'under supervision'.",
+        priority: "required",
+      },
+      {
+        id: "wlc-2",
+        label: "Supervisory reporting hierarchy diagram",
+        description: "Visually demonstrate that the beneficiary reports directly to senior staff who oversee their daily work.",
+        priority: "required",
+      },
+      {
+        id: "wlc-3",
+        label: "Detailed supervisor letter",
+        description: "A letter from the direct manager describing the close supervision and guidance provided to the beneficiary.",
+        priority: "recommended",
+      },
+    ],
+  },
+
+  "Degree Match Challenge": {
+    category: "Degree Match Challenge",
+    rationale: "USCIS challenges the alignment of the beneficiary's specific degree with the specialty occupation.",
+    items: [
+      {
+        id: "dmc-1",
+        label: "Third-party academic credential evaluation",
+        description: "Mapping coursework from the beneficiary's degree directly to the required academic field.",
+        priority: "required",
+      },
+      {
+        id: "dmc-2",
+        label: "Course-by-course transcript analysis",
+        description: "Detailed credit-hour breakdown demonstrating sufficient study in the required discipline.",
+        priority: "required",
+      },
+      {
+        id: "dmc-3",
+        label: "Industry expert evaluation letter",
+        description: "A letter from a professor or industry leader explaining why the degree is relevant to the job duties.",
+        priority: "recommended",
+      },
+    ],
+  },
+
+  "Missing USCIS RFE Letter": {
+    category: "Missing USCIS RFE Letter",
+    rationale: "To map specific USCIS challenges, the full text of the RFE letter is required.",
+    items: [
+      {
+        id: "mrfe-1",
+        label: "Upload or paste RFE letter",
+        description: "Provide the complete PDF text of the official USCIS Request for Evidence letter.",
+        priority: "required",
+      },
+    ],
+  },
 };
 
 /**
  * Get evidence items for a specific flag category.
  * Falls back to a generic checklist if no exact match is found.
  */
-export function getEvidenceForCategory(category: string): EvidenceCategory | null {
-  return EVIDENCE_MAP[category] || null;
+export function getEvidenceForCategory(category: string): EvidenceCategory {
+  // Exact match
+  if (EVIDENCE_MAP[category]) {
+    return EVIDENCE_MAP[category];
+  }
+
+  // Fuzzy / alias mapping
+  const catLower = category.toLowerCase();
+  if (catLower.includes("specialty occupation")) {
+    return EVIDENCE_MAP["Specialty Occupation"];
+  }
+  if (catLower.includes("wage level")) {
+    return EVIDENCE_MAP["Wage Level Challenge"] || EVIDENCE_MAP["Wage Level Misalignment"];
+  }
+  if (catLower.includes("degree")) {
+    return EVIDENCE_MAP["Degree Match Challenge"] || EVIDENCE_MAP["Degree Field Mismatch"];
+  }
+
+  // Fallback to a generic checklist
+  return {
+    category: category,
+    rationale: "Gathering supporting evidence helps establish eligibility and proactively addresses potential USCIS objections.",
+    items: [
+      {
+        id: "gen-1",
+        label: "Clarified Employer Support Letter",
+        description: "Refining the job duties and qualifications details in the petition package.",
+        priority: "required",
+      },
+      {
+        id: "gen-2",
+        label: "Form I-129 / LCA correlation check",
+        description: "Verifying that job titles, SOC codes, and worksites are identical across forms.",
+        priority: "required",
+      },
+      {
+        id: "gen-3",
+        label: "Company profile & credentials",
+        description: "Organizational charts, employee counts, or project plans validating the position.",
+        priority: "recommended",
+      },
+    ],
+  };
 }
